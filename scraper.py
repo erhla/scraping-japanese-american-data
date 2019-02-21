@@ -13,6 +13,8 @@ import urllib.parse
 import os
 import requests
 import pandas as pd
+from selenium import webdriver
+import time
 
 COLUMN_NAMES = set(['LAST NAME',
  'FIRST NAME',
@@ -76,7 +78,6 @@ def process_soup(soup):
 		if field_name in COLUMN_NAMES:
 			d[field_name] = coded_value
 	next_link = absolute_fragment + soup.find_all('a')[-11]['href']
-	print(next_link)
 	return d, next_link
 
 def crawl(starting_url, number_to_crawl):
@@ -87,7 +88,7 @@ def crawl(starting_url, number_to_crawl):
 	coded_ls.append(coded)
 
 	i = 1
-	while i <= number_to_crawl:
+	while i < number_to_crawl:
 		soup = url_to_soup(next_link)
 		coded, next_link = process_soup(soup)
 		coded_ls.append(coded)
@@ -99,4 +100,33 @@ def crawl(starting_url, number_to_crawl):
 
 	return df
 
+birth_url = 'https://aad.archives.gov/aad/display-partial-records.jsp?dt=2003&sc=24943%2C24947%2C24948%2C24949%2C24942%2C24938%2C24928%2C24940&cat=all&tf=F&bc=sl%2Cfd&q=&as_alq=&as_anq=&as_epq=&as_woq=&nfo_24943=V%2C10%2C1900&op_24943=0&txt_24943=&nfo_24947=V%2C8%2C1900&op_24947=0&txt_24947=&nfo_24948=V%2C1%2C1900&op_24948=0&txt_24948=&nfo_24949=V%2C1%2C1900&cl_24949=&nfo_24942=V%2C1%2C1900&cl_24942=&nfo_24938=V%2C5%2C1900&cl_24938=&nfo_24928=V%2C6%2C1900&op_24928=0&txt_24928=&nfo_24940=V%2C2%2C1900&op_24940=0&txt_24940='
 
+def process_search(soup):
+	records = soup.find_all('p')[2].text
+	r_str = re.findall('[0-9,]*', records)[10]
+
+	first_record = soup.find_all('table')[1].find_all('a')[8]['href']
+
+
+	return int(r_str.replace(',','')), absolute_fragment + first_record
+
+def scrape(year_of_birth):
+	starting_url = birth_url + str(year_of_birth)
+	driver = webdriver.Firefox()
+	driver.get(starting_url)
+	driver.implicitly_wait(10)
+	time.sleep(10)
+	html = driver.page_source
+	driver.close()
+	soup = bs4.BeautifulSoup(html, 'html5lib')
+	num_records, first_link = process_search(soup)
+
+	df = crawl(first_link, num_records)
+
+	return df
+
+def get_years(first_year,last_year):
+	'''
+	'''
+	pass
