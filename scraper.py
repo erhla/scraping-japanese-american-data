@@ -93,7 +93,6 @@ def crawl(starting_url, number_to_crawl):
 		coded, next_link = process_soup(soup)
 		coded_ls.append(coded)
 		i = i + 1
-		print(i)
 
 	df = pd.DataFrame(coded_ls)
 
@@ -105,11 +104,12 @@ birth_url = 'https://aad.archives.gov/aad/display-partial-records.jsp?dt=2003&sc
 def process_search(soup):
 	records = soup.find_all('p')[2].text
 	r_str = re.findall('[0-9,]*', records)[10]
+	num_records = int(r_str.replace(',',''))
+	if num_records == 0:
+		return 0, None
 
 	first_record = soup.find_all('table')[1].find_all('a')[8]['href']
-
-
-	return int(r_str.replace(',','')), absolute_fragment + first_record
+	return num_records, absolute_fragment + first_record
 
 def scrape(year_of_birth):
 	starting_url = birth_url + str(year_of_birth)
@@ -121,12 +121,21 @@ def scrape(year_of_birth):
 	driver.close()
 	soup = bs4.BeautifulSoup(html, 'html5lib')
 	num_records, first_link = process_search(soup)
-
+	if num_records == 0:
+		return pd.DataFrame()
 	df = crawl(first_link, num_records)
 
 	return df
 
-def get_years(first_year,last_year):
-	'''
-	'''
-	pass
+def get_years(first_year, output_filename):
+	
+	current_year = first_year
+	counter = 0
+	with open(output_filename, 'a') as file: 
+		while counter < 100:
+			current_df = scrape(current_year % 100)
+			if not current_df.empty:
+				current_df.to_csv(file, header=False, index=False)
+			current_year = current_year + 1
+			counter = counter + 1
+			print(current_year % 100 - 1, current_df.shape[0])
