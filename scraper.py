@@ -94,10 +94,7 @@ def crawl(starting_url, number_to_crawl):
 		coded_ls.append(coded)
 		i = i + 1
 
-	df = pd.DataFrame(coded_ls)
-
-
-	return df
+	return pd.DataFrame(coded_ls)
 
 birth_url = 'https://aad.archives.gov/aad/display-partial-records.jsp?dt=2003&sc=24943%2C24947%2C24948%2C24949%2C24942%2C24938%2C24928%2C24940&cat=all&tf=F&bc=sl%2Cfd&q=&as_alq=&as_anq=&as_epq=&as_woq=&nfo_24943=V%2C10%2C1900&op_24943=0&txt_24943=&nfo_24947=V%2C8%2C1900&op_24947=0&txt_24947=&nfo_24948=V%2C1%2C1900&op_24948=0&txt_24948=&nfo_24949=V%2C1%2C1900&cl_24949=&nfo_24942=V%2C1%2C1900&cl_24942=&nfo_24938=V%2C5%2C1900&cl_24938=&nfo_24928=V%2C6%2C1900&op_24928=0&txt_24928=&nfo_24940=V%2C2%2C1900&op_24940=0&txt_24940='
 
@@ -111,31 +108,45 @@ def process_search(soup):
 	first_record = soup.find_all('table')[1].find_all('a')[8]['href']
 	return num_records, absolute_fragment + first_record
 
-def scrape(year_of_birth):
+def process_driver(driver):
+	html = driver.page_source
+	soup = bs4.BeautifulSoup(html, 'html5lib')
+	return process_search(soup)
+
+def write_records(records_df, output_filename):
+	with open(output_filename, 'a') as file: 
+		records_df.to_csv(file, header=False, index=False)
+
+
+def scrape(year_of_birth, output_filename):
+	ls = []
 	starting_url = birth_url + str(year_of_birth)
+
 	driver = webdriver.Firefox()
 	driver.get(starting_url)
-	driver.implicitly_wait(10)
 	time.sleep(10)
-	html = driver.page_source
-	driver.close()
-	soup = bs4.BeautifulSoup(html, 'html5lib')
-	num_records, first_link = process_search(soup)
-	if num_records == 0:
-		return pd.DataFrame()
-	df = crawl(first_link, num_records)
+	records, current_link = process_driver(driver)
 
-	return df
+	if records == 0:
+		return None
+	else:
+		while records > 0:
+			write_records(crawl(current_link, min(records, 10)), output_filename)
+			if records > 10:
+				next_page_link = driver.find_element_by_link_text('Next >')
+				next_page_link.click()
+				time.sleep(10)
+				_, current_link = process_driver(driver)
+			records = records - 10
+
+	driver.close()
+	return 
 
 def get_years(first_year, output_filename):
-	
-	current_year = first_year
 	counter = 0
-	with open(output_filename, 'a') as file: 
-		while counter < 100:
-			current_df = scrape(current_year % 100)
-			if not current_df.empty:
-				current_df.to_csv(file, header=False, index=False)
-			current_year = current_year + 1
-			counter = counter + 1
-			print(current_year % 100 - 1, current_df.shape[0])
+	current_year = first_year
+	while counter < 100:
+		scrape(current_year, output_filename)
+		current_year = current_year + 1
+		counter = counter + 1
+		print(current_year % 100 - 1)	
