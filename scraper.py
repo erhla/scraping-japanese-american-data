@@ -15,6 +15,7 @@ import requests
 import pandas as pd
 from selenium import webdriver
 import time
+import tenacity
 
 COLUMN_NAMES = set(['LAST NAME',
  'FIRST NAME',
@@ -55,6 +56,12 @@ COLUMN_NAMES = set(['LAST NAME',
 
 starting_url = 'https://aad.archives.gov/aad/record-detail.jsp?dt=2003&mtch=6919&cat=all&tf=F&sc=24943,24947,24948,24949,24942,24938,24928,24940&bc=sl,fd&cl_24949=8&op_24949=null&nfo_24949=V,1,1900&rpp=10&pg=1&rid=82&rlst=82,98,99,100,101,102,103,104,105,107'
 absolute_fragment = 'https://aad.archives.gov/aad/'
+
+@tenacity.retry(wait=tenacity.wait_fixed(30),
+                retry=tenacity.retry_if_exception_type(ValueError),
+                stop=tenacity.stop_after_delay(1800)
+                )
+
 
 def url_to_soup(url):
 
@@ -117,6 +124,15 @@ def write_records(records_df, output_filename):
 	with open(output_filename, 'a') as file: 
 		records_df.to_csv(file, header=False, index=False)
 
+'''
+def divide_big_year(records, current_link, driver, output_filename):
+	num_sections = records // 90
+	#initalize next driver
+	for i in range(num_records):
+'''
+
+
+
 
 def scrape(year_of_birth, output_filename):
 	ls = []
@@ -127,9 +143,10 @@ def scrape(year_of_birth, output_filename):
 	time.sleep(10)
 	records, current_link = process_driver(driver)
 
-	if records == 0:
-		return None
-	else:
+	#if records >= 200:
+	#	divide_big_year(records, current_link, driver, output_filename)
+
+	if records != 0 :
 		while records > 0:
 			write_records(crawl(current_link, min(records, 10)), output_filename)
 			if records > 10:
@@ -142,11 +159,13 @@ def scrape(year_of_birth, output_filename):
 	driver.close()
 	return 
 
-def get_years(first_year, output_filename):
-	counter = 0
+def get_years(first_year, last_year):
 	current_year = first_year
-	while counter < 100:
+	if last_year >= 0:
+		output_filename = str(first_year) + '_to_' + str(last_year) + '.csv'
+	else:
+		output_filename = str(first_year) + '.csv'
+	while current_year <= last_year:
 		scrape(current_year, output_filename)
+		print("Year completed:", current_year % 100)	
 		current_year = current_year + 1
-		counter = counter + 1
-		print(current_year % 100 - 1)	
