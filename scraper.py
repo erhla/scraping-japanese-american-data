@@ -56,12 +56,12 @@ COLUMN_NAMES = set(['LAST NAME',
 
 starting_url = 'https://aad.archives.gov/aad/record-detail.jsp?dt=2003&mtch=6919&cat=all&tf=F&sc=24943,24947,24948,24949,24942,24938,24928,24940&bc=sl,fd&cl_24949=8&op_24949=null&nfo_24949=V,1,1900&rpp=10&pg=1&rid=82&rlst=82,98,99,100,101,102,103,104,105,107'
 absolute_fragment = 'https://aad.archives.gov/aad/'
-
+'''
 @tenacity.retry(wait=tenacity.wait_fixed(30),
                 retry=tenacity.retry_if_exception_type(ValueError),
                 stop=tenacity.stop_after_delay(1800)
                 )
-
+'''
 
 def url_to_soup(url):
 
@@ -124,27 +124,15 @@ def write_records(records_df, output_filename):
 	with open(output_filename, 'a') as file: 
 		records_df.to_csv(file, header=False, index=False)
 
-'''
-def divide_big_year(records, current_link, driver, output_filename):
-	num_sections = records // 90
-	#initalize next driver
-	for i in range(num_records):
-'''
-
-
-
 
 def scrape(year_of_birth, output_filename):
 	ls = []
-	starting_url = birth_url + str(year_of_birth)
+	starting_url = birth_url + year_of_birth
 
 	driver = webdriver.Firefox()
 	driver.get(starting_url)
 	time.sleep(10)
 	records, current_link = process_driver(driver)
-
-	#if records >= 200:
-	#	divide_big_year(records, current_link, driver, output_filename)
 
 	if records != 0 :
 		while records > 0:
@@ -159,13 +147,22 @@ def scrape(year_of_birth, output_filename):
 	driver.close()
 	return 
 
-def get_years(first_year, last_year):
-	current_year = first_year
-	if last_year >= 0:
-		output_filename = str(first_year) + '_to_' + str(last_year) + '.csv'
-	else:
-		output_filename = str(first_year) + '.csv'
-	while current_year <= last_year:
-		scrape(current_year, output_filename)
+def get_years(first_year_str, last_year_str):
+	'''
+	For example, to scrape 1900 to 1910 call get_years('00', '10')
+	'''
+
+	current_year = int(first_year_str)
+
+	output_filename = first_year_str + '_to_' + last_year_str + '.csv'
+
+	while current_year <= int(last_year_str):
+		if current_year < 10:
+			current_year_str = '0' + str(current_year)
+		else:
+			current_year_str = str(current_year)
+
+		scrape(current_year_str, output_filename)
 		print("Year completed:", current_year % 100)	
 		current_year = current_year + 1
+
