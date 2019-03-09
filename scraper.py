@@ -1,6 +1,14 @@
 """
 scraping-japanese-american-data
 
+scraper.py scrapes webpages from the National
+Archives to a designated csv file
+
+Call get_years(starting year, ending year) to
+scrape records
+
+For example, to scrape 1900 to 1910 call get_years('00', '10')
+
 Eric Langowski
 """
 
@@ -56,12 +64,6 @@ COLUMN_NAMES = set(['LAST NAME',
 
 starting_url = 'https://aad.archives.gov/aad/record-detail.jsp?dt=2003&mtch=6919&cat=all&tf=F&sc=24943,24947,24948,24949,24942,24938,24928,24940&bc=sl,fd&cl_24949=8&op_24949=null&nfo_24949=V,1,1900&rpp=10&pg=1&rid=82&rlst=82,98,99,100,101,102,103,104,105,107'
 absolute_fragment = 'https://aad.archives.gov/aad/'
-'''
-@tenacity.retry(wait=tenacity.wait_fixed(30),
-                retry=tenacity.retry_if_exception_type(ValueError),
-                stop=tenacity.stop_after_delay(1800)
-                )
-'''
 
 def url_to_soup(url):
 
@@ -81,7 +83,6 @@ def process_soup(soup):
 		cells = row.find_all('td')
 		field_name = cells[0].text.strip()
 		coded_value = cells[1].text.strip()
-		#mapped_value = cells[2].text.strip()
 		if field_name in COLUMN_NAMES:
 			d[field_name] = coded_value
 	next_link = absolute_fragment + soup.find_all('a')[-11]['href']
@@ -98,6 +99,7 @@ def crawl(starting_url, number_to_crawl):
 	while i < number_to_crawl:
 		soup = url_to_soup(next_link)
 		coded, next_link = process_soup(soup)
+		print(coded)
 		coded_ls.append(coded)
 		i = i + 1
 
