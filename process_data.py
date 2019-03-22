@@ -155,7 +155,7 @@ def bad_values(df, values_dict):
                     print(value, 'appears ', count)
 
 
-def process(file_name, data_dir):
+def process(file_name, data_dir, download_files=False):
     '''
     process takes a file_name which is a csv of the NARA database and
     returns a dataframe with column names and proper types
@@ -181,11 +181,13 @@ def process(file_name, data_dir):
     df = pd.read_csv(file_name, skiprows=[0], names=col_names, dtype=str)
     for col in to_correct:
         df[col] = df[col].apply(lambda x: str(x).replace(".0", "") if x == x else x)
-    values_dict = generate_data_dictionary(data_dir)
+    values_dict = generate_data_dictionary(data_dir, download_files)
 
     for col in col_names:
         print(col)
         if values_dict[col]:
             df[col] = df[col].map(values_dict[col]).astype('category')
+    df['YEAR OF BIRTH'] = df['YEAR OF BIRTH'].astype(int)
+    df['YEAR OF BIRTH'] = df['YEAR OF BIRTH'].apply(lambda x: 1800 + x if x > 43 else 1900 + x)
 
     return df
