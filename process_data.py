@@ -49,9 +49,28 @@ def generate_data_dictionary(directory):
             file_df = pd.read_csv(file_loc, index_col=0, usecols=[0,1], dtype=str)
             file_dict = file_df.to_dict()['Meaning']
             if file_id == 251:
-                new = {}
-                for key, val in file_dict.items():
-                    
+                missing_dict = {'039': '39',
+                				'030': '30',
+                				'071': '71',
+                				'043': '43',
+                				'024': '24',
+                				'072': '72',
+                				'008': '8',
+                				'045': '45',
+                				'098': '98',
+                				'048': '48',
+                				'4X2': '4-2',
+                				'4X6': '4-6',
+                				'6X6': '6-6',
+                				'6X4': '6-4',
+                				'2X1': '2-1'
+                				}
+                for key, to_add in missing_dict.items():
+                	file_dict[to_add] = file_dict[key]
+            if file_id == 237:
+            	graduate_ls = list('HIJKL')
+            	for item in graduate_ls:
+            		file_dict[item] = '16 YEARS, ETC.'	
             if col_name == 'RELOCATION PROJECT':
                 new = {}
                 for key, val in file_dict.items():
@@ -62,7 +81,7 @@ def generate_data_dictionary(directory):
             values_dict[col_name] = None
     return values_dict
 
-def map_value(entry, values_dict):
+def view_record(entry, values_dict):
     for col, row in entry.iteritems():   
         code_dict = values_dict[col]
         if code_dict:
@@ -71,14 +90,44 @@ def map_value(entry, values_dict):
             else:
                 code = ''
         else:                  
-            code = ''      
-        print(col, '| ', row, '| ', code)
+            code = ''
+        if code:
+        	print(col, ':', code)
+        else:
+        	print(col, ':', row)
+
+def bad_values(df, values_dict):
+
+	for col in df.columns:
+		col_values = df[col].unique()
+		valid_values = values_dict[col]
+		if valid_values:
+			bad_values = set(col_values) - set(valid_values)
+		if bad_values:
+			print(col, ' has bad values')
+			for value in bad_values:
+				count = df[df[col] == value].shape[0]
+				if count > 5:
+					print(value, 'appears ', count)
 
 
 def process(file_name):
     col_names = []
     to_correct = ['POTENTIAL OCCUPATION 1',
-                  'POTENTIAL OCCUPATION 2']
+                  'POTENTIAL OCCUPATION 2',
+                  'PRIMARY OCCUPATION',
+                  'SECONDARY OCCUPATION',
+                  'TERTIARY OCCUPATION',
+                  'RELOCATION PROJECT',
+                  'EDUCATIONAL DEGREES',
+                  'LANGUAGE',
+                  'LAST PERMANENT ADDRESS POPULATION DENSITY',
+                  'LAST PERMANENT ADDRESS STATE',
+                  'NUMBER OF TIMES IN JAPAN',
+                  'RACE OF INDIVIDUAL AND SPOUSE',
+                  'SEX AND MARITAL STATUS',
+                  'TOTAL LENGTH OF TIME IN JAPAN',
+                  'YEARS OF SCHOOLING IN JAPAN']
     for item, _ in NAMES_CODES:
         col_names.append(item)
     df = pd.read_csv(file_name, skiprows=[0], names=col_names, dtype=str)
