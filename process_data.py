@@ -97,8 +97,7 @@ def generate_data_dictionary(directory, download_files=False):
                                 '4X6': '4-6',
                                 '6X6': '6-6',
                                 '6X4': '6-4',
-                                '2X1': '2-1'
-                                }
+                                '2X1': '2-1'}
                 for key, to_add in missing_dict.items():
                     file_dict[to_add] = file_dict[key]
             if file_id == 237:
@@ -184,9 +183,9 @@ def process(file_name, data_dir, download_files=False):
     values_dict = generate_data_dictionary(data_dir, download_files)
 
     for col in col_names:
-        print(col)
         if values_dict[col]:
             df[col] = df[col].map(values_dict[col]).astype('category')
+
     df['YEAR OF BIRTH'] = df['YEAR OF BIRTH'].astype(int)
     df['YEAR OF BIRTH'] = df['YEAR OF BIRTH'].apply(lambda x: 1800 + x if x > 43 else 1900 + x)
 
