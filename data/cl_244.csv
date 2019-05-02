@@ -1,0 +1,13 @@
+Code,Meaning,Comments
+"9","FEMALE DIVORCED",""
+"7","FEMALE MARRIED",""
+"-","FEMALE SEPARATED",""
+"6","FEMALE SINGLE",""
+"&","FEMALE UNKNOWN",""
+"8","FEMALE WIDOWED",""
+"4","MALE DIVORCED",""
+"2","MALE MARRIED",""
+"5","MALE SEPARATED",""
+"1","MALE SINGLE",""
+"0","MALE UNKNOWN",""
+"3","MALE WIDOWED",""

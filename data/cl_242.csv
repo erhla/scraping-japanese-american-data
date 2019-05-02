@@ -1,0 +1,10 @@
+Code,Meaning,Comments
+"4","BETWEEN AGES 0-9 & ALSO 10-19",""
+"6","BETWEEN AGES 0-9 & ALSO 20 & OVER",""
+"1","BETWEEN AGES 0-9 ONLY","Numbers are in years"
+"5","BETWEEN AGES 0-9, 10-19 & ALSO 20 & OVER",""
+"7","BETWEEN AGES 10-19 & ALSO 20 & OVER",""
+"2","BETWEEN AGES 10-19 ONLY",""
+"3","BETWEEN AGES 20 OR OVER ONLY",""
+"0","NEVER IN JAPAN",""
+"&","UNKNOWN",""

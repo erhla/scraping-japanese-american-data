@@ -1,0 +1,12 @@
+Code,Meaning,Comments
+"&","BLANK, UNKNOWN, NONE, DASH",""
+"3","CLERICAL & SALES","Comparable United States Employment Service code numbers 1-01 thru 1-97.  See documentation."
+"6","FARM LABORERS INCLUDING FOREMEN","Comparable United States Employment Service code numbers 3-11 thru 3-49.  See documentation."
+"5","FARM OPERATORS & MANAGERS","Comparable United States Employment Service code numbers 3-00 thru 3-09 (part of 3-37).  See documentation."
+"7","FISHERMEN","Comparable United States Employment Service code numbers 3-87 thru 3-89.  See documentation."
+"2","MANAGERIAL & OFFICIAL (EXCEPT FARM)","Comparable United States Employment Service code numbers 0-7 thru 0-99.  See documentation."
+"1","PROFESSIONAL & SEMI-PROFESSIONAL","Comparable United States Employment Service code numbers 0-0 thru 0-69.  See documentation."
+"4","SERVICE","Comparable United States Employment Service code numbers 2-01 thru 2-95.  See documentation."
+"8","SKILLED CRAFTSMEN & FOREMEN/SEMI-SKILLED OPERATORS (EXCEPT FARM) ","Except Farm.  Comparable United States Employment Service code numbers 4 thru 7.  See documentation."
+"-","UNREVISED FORMS (NOT ON SCHEDULE)",""
+"9","UNSKILLED LABORERS (EXCEPT FARM)","Comparable United States Employment Service code numbers 8 thru 9.  See documentation."
