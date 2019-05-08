@@ -31,6 +31,22 @@ outcomes = {'hospitalized': ['Term-Mental', 'TD-Inst', 'Term-I Hosp', 'Term-I (H
             'employed': ['Ind-Empl'],
             'granted': ['Term W-G', 'Term-with Grant']}
 
+
+mixed_race = ['Japanese and Other, No spouse [6]', 'Japanese and White, No spouse [5]',       
+       'Japanese and White, Spouse: Japanese [J]',
+       'Japanese and White, Spouse: White [W]',
+       'Japanese and Other, Spouse: Japanese [K]',
+       'White and Other, Spouse: Japanese [2]',
+       'Japanese and Other, Spouse: White [X]',
+       'Japanese and White, Spouse: Japanese and White [M]',
+       'Japanese, Spouse: Japanese and Other [O]']
+
+mixed_marriage = ['Japanese, Spouse: White [V]','White, Spouse: Japanese [S]', 
+                  'Other, Spouse: Japanese [1]','Japanese, Spouse: Japanese and White [L]',
+       'White, Spouse: Japanese and White [T]', 'White, No spouse [8]']
+
+
+
 for outcome, vals in outcomes.items():
     sliced = df[df.type_of_final_departure.isin(vals)]
     count = sliced.shape[0]
