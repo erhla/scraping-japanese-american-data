@@ -4,6 +4,7 @@ Created on Tue May  7 23:28:31 2019
 
 @author: erhla
 """
+#cd Documents/GitHub/names-rawdata/processed/
 import pandas as pd
 import recordlinkage
 
