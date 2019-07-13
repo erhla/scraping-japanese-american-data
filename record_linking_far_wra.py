@@ -97,7 +97,9 @@ wra_tiny.loc[wra_tiny['m_camp'] == 'amache', 'm_camp'] = 'granada'
 wra_tiny.loc[wra_tiny['m_camp'] == '-tulelake', 'm_camp'] = 'tulelake'
 
 
-'B', 'Birth-Ind.Lv.', 
+#'B', 'Birth-Ind.Lv.', 
+
+
 
 
 def group_cnt(df, col_name):
